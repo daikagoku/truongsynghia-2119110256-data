@@ -8,9 +8,9 @@
    <bean id = "dataSource" 
       class = "org.springframework.jdbc.datasource.DriverManagerDataSource">
       <property name = "driverClassName" value = "org.postgresql.Driver"/>
-      <property name = "url" value = "jdbc:postgresql://localhost:1234/SPdatabase"/>
-      <property name = "username" value = "postgres"/>
-      <property name = "password" value = "245387262"/>
+      <property name = "url" value = "jdbc:postgresql://ec2-52-54-167-8.compute-1.amazonaws.com:5432/d3k26hr1nvsoh8"/>
+      <property name = "username" value = "gaqmwhpqvpftpl"/>
+      <property name = "password" value = "d6834ef7f9d18b407a3b0d47ceb5ed54180809ffc0f4b60e0f0ff4e40b4e588a"/>
    </bean>
    <!-- Definition for productJDBCTemplate bean -->
    <bean id = "productTemplate" 
