@@ -17,6 +17,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.release>3.8.1</maven.compiler.release>
 	</properties>
 	<dependencies>
 		<dependency>

@@ -9,17 +9,16 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.example.core.Convert;
 import com.example.user.dto.ProductDto;
 import com.example.user.mapper.ProductMapper;
-import com.example.core.Convert;
-import com.example.core.InitData;
+
 
 public class ProductTemplate {
 
 	private DataSource dataSource;
 	private JdbcTemplate jdbcTemplateObject;
 	private Convert convert = new Convert();
-	private InitData init = new InitData();
 	public void setDataSource(DataSource ds) {
 		this.dataSource = ds;
 		this.jdbcTemplateObject = new JdbcTemplate(ds);
