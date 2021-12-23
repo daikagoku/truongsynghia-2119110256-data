@@ -25,8 +25,6 @@ public class ProductTemplate {
 		this.jdbcTemplateObject = new JdbcTemplate(ds);
 	}	
 	public void runInit() {
-		String sql = init.getProduct();
-		jdbcTemplateObject.execute(sql);
 	}
 	public int getCount() {
 		String SQL = "select count(*) as count "
