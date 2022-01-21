@@ -1,5 +1,6 @@
 package com.example.core.entity;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,52 +9,72 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "post_topic")
-public class PostTopicEntity {
+@Table(name = "about")
+public class AboutEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column()
-	private Long postId;
-	@Column()
-	private Long topicId;
+	
+	@Column(length = 100, nullable = false)
+	private String title;
 
+	@Column(length = 100, nullable = false)
+	private String alias;
+
+	@Column(length = 200)
+	private String value;
+	
 	@Column(columnDefinition = "boolean default true")
 	private boolean status;
 
 	@Column(columnDefinition = "boolean default false")
-	private boolean trash;	
+	private boolean trash;
+
+	
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
-	}	
-	public Long getPostId() {
-		return postId;
 	}
-	public void setPostId(Long postId) {
-		this.postId = postId;
+
+	public String getTitle() {
+		return title;
 	}
-	public Long getTopicId() {
-		return topicId;
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
-	public void setTopicId(Long topicId) {
-		this.topicId = topicId;
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 	public boolean isStatus() {
 		return status;
 	}
+
 	public void setStatus(boolean status) {
 		this.status = status;
 	}
+
 	public boolean isTrash() {
 		return trash;
 	}
+
 	public void setTrash(boolean trash) {
 		this.trash = trash;
 	}
-
-
-
 }

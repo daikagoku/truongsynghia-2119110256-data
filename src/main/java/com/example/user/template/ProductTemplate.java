@@ -1,114 +1,135 @@
 package com.example.user.template;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.example.core.Convert;
+import com.example.core.InitSelectSql;
 import com.example.user.dto.ProductDto;
 import com.example.user.mapper.ProductMapper;
+import com.example.user.template.base.TemplateBase;
 
 
-public class ProductTemplate {
-
-	private DataSource dataSource;
-	private JdbcTemplate jdbcTemplateObject;
-	private Convert convert = new Convert();
-	public void setDataSource(DataSource ds) {
-		this.dataSource = ds;
-		this.jdbcTemplateObject = new JdbcTemplate(ds);
-	}	
-	public void runInit() {
+public class ProductTemplate extends TemplateBase{
+	
+	
+	public InitSelectSql productSql = null;
+	public InitSelectSql productCategorySql = null;
+	public InitSelectSql categorySql = null;
+	
+	public ProductTemplate() {
+		this.tables = " v_product";
 	}
-	public int getCount() {
-		String SQL = "select count(*) as count "
-				+" from product p,product_version v "
-				+" where p.id=v.productId ";
-		Map<String, Object> count = jdbcTemplateObject.queryForMap(SQL);
-		return (int) count.get("count");
-
+	
+	public void mergeSql() {
+		if(productCategorySql != null) {
+			if(categorySql != null) {
+				productCategorySql.addSubWhere("pc.parent_id",categorySql.getSql(),"in");
+			}
+			productSql.addSubWhere("p.id",productCategorySql.getSql(),"in");
+		}
+		this.sql = productSql.getSql();	
+		System.out.println(sql);
+	
+		productSql = null;
+		categorySql = null;
+		productCategorySql = null;
 	}
-	public List<ProductDto> get(long id,long version_id) {
-		String SQL = "select p.id id,p.title title,p.alias alias"
-				+",content,description,price,sale_price,"
-				+"(select i.url image"
-						+" from image i,image_using u "
-						+" where  i.id = u.image_id "
-				 				+" and u.position_id = v.id "
-				 				+" and u.position like 'product-version' "
-				 				+" and u.status = true and u.trash = false"
-								+" and i.status = true and i.trash = false"
-				+"),"
-				+"(select AVG(vote) rating "
-						 +" from product_rating r  "
-						 +" where  r.product_id = p.id  " 
-							 +" and r.status = true and r.trash = false "
-				+"),"
-				+"v.id version_id,v.title version_title,v.alias version_alias"
-				+" from product p,product_version v"
-				+" where p.id = ? and v.id = ?"
-					+" and p.id=v.product_id"
-					+" and p.status = true and p.trash = false"
-					+" and v.status = true and v.trash = false";
-		List<ProductDto> products = jdbcTemplateObject.query(SQL, new ProductMapper(),new Object[] { id,version_id});
-		System.out.println(SQL);
+	public void initGetCount() {
+		productSql = new InitSelectSql("count(*) count","v_product p");
+	}
+	public void initGetProduct() {	
+		productSql = new InitSelectSql("*","v_product p");
+		InitSelectSql imageSql = new InitSelectSql("url image","v_image i");
+		imageSql.addWhere("p.image_id = i.id");
+		
+		InitSelectSql ratingSql = new InitSelectSql("AVG(vote) rating","v_product_rating r");
+		ratingSql.addWhere("r.product_id = p.id");
+		
+		productSql.addSubSelect(imageSql.getSql());
+		productSql.addSubSelect(ratingSql.getSql());
+	};	
+
+	public List<ProductDto> execute() {
+		mergeSql();
+		List<ProductDto> products = jdbcTemplateObject.query(this.sql, new ProductMapper());
 		return products;
+	};
+	public void addGetById(long id) {
+		productSql.addWhere("p.id",id);
 	}
-	public List<ProductDto> get(String alias,String versionAlias) {
-		String SQL = "select p.id id,p.title title,p.alias alias"
-				+",content,description,price,sale_price,"
-				+"(select i.url image"
-						+" from image i,image_using u "
-						+" where  i.id = u.image_id "
-				 				+" and u.position_id = v.id "
-				 				+" and u.position like 'product-version' "
-				 				+" and u.status = true and u.trash = false"
-								+" and i.status = true and i.trash = false"
-				+"),"
-				+"(select AVG(vote) rating "
-						 +" from product_rating r  "
-						 +" where  r.product_id = p.id  " 
-							 +" and r.status = true and r.trash = false "
-				+"),"
-				+"v.id version_id,v.title version_title,v.alias version_alias"
-				+" from product p,product_version v"
-				+" where p.alias like ? and v.alias like ?"
-					+" and p.id=v.product_id"
-					+" and p.status = true and p.trash = false"
-					+" and v.status = true and v.trash = false";
-		List<ProductDto> products = jdbcTemplateObject.query(SQL, new ProductMapper(),new Object[] { alias,versionAlias});
-		System.out.println(SQL);
-		return products;
+	public void addGetByVersionId(long version_id) {
+		productSql.addWhere("p.version_id",version_id);
 	}
-	public List<ProductDto> getAll() {
-		String SQL = "select p.id id,p.title title,p.alias alias"
-				+",content,description,price,sale_price,"
-				+"(select i.url image"
-						+" from image i,image_using u "
-						+" where  i.id = u.image_id "
-				 				+" and u.position_id = v.id "
-				 				+" and u.position like 'product-version' "
-				 				+" and u.status = true and u.trash = false"
-								+" and i.status = true and i.trash = false"
-				+"),"
-				+"(select AVG(vote) rating "
-						 +" from product_rating r  "
-						 +" where  r.product_id = p.id  " 
-							 +" and r.status = true and r.trash = false "
-				+"),"
-				+"v.id version_id,v.title version_title,v.alias version_alias"
-				+" from product p,product_version v"
-				+" where p.id=v.product_id"
-					+" and p.status = true and p.trash = false"
-					+" and v.status = true and v.trash = false";
-		System.out.println(SQL);
-		List<ProductDto> products = jdbcTemplateObject.query(SQL, new ProductMapper());
-		return products;
+	public void addGetByAlias(String alias) {
+		productSql.addWhere("p.alias",alias);
+	}
+	public void addGetByVersionAlias(String version_alias) {
+		productSql.addWhere("p.version_alias",version_alias);
+	}
+	public void addGetByPrice(double start,double end) {
+		if(start > -1 && end > -1) {
+			productSql.addWhereBetween("p.price",start,end);
+		}else {
+			if(start > -1 && end < 0) {
+				addGetByPrice(start,">");
+			}else if(start < 0 && end > -1) {
+				addGetByPrice(end,"<");
+			}
+		}
+	}
+	public void addGetByPrice(double price,String operator) {
+		productSql.addWhere("p.price",price,operator);
+	}
+	
+	
+	public void addGetBySalePrice(double start,double end) {
+		if(start > -1 && end > -1) {
+			productSql.addWhereBetween("p.sale_price",start,end);
+		}else {
+			if(start > -1 && end < 0) {
+				addGetBySalePrice(start,">");
+			}else if(start < 0 && end > -1) {
+				addGetBySalePrice(end,"<");
+			}
+		}
+	}
+	public void addGetBySalePrice(double price,String operator) {
+		productSql.addWhere("p.sale_price",price,operator);
+	}
+	public void addGetBySalePriceDate(Calendar start,Calendar end) {
+		
+	}
+	public void addGetBySaleDate(Calendar date,String operator) {
+		
+	}
+	public void setOffset(long offset) {
+		productSql.setOffset(offset);
+		
+	}
+	public void setLimit(long limit) {
+		productSql.setLimit(limit);
+		
+	}
+	
+	
+	public void initProductCategoryGet() {			
+		productCategorySql = new InitSelectSql("pc.product_id","v_product_category pc");		
+	};		
+	public void addGetByCategoryAlias(String[] alias) {
+		productCategorySql.addWhere("pc.alias", alias);
+		
+	}
+	
+	public void initCategoryGet() {			
+		categorySql = new InitSelectSql("c.id","v_category c");		
+	};
+	public void addGetByCategoryParentAlias(String parent_alias) {
+		categorySql.addWhere("c.alias", parent_alias);
+		
 	}
 
+	public void addGetByQuery(String query) {
+		productSql.orWhere("p.title", "%"+query+"%");
+		
+	}
 }

@@ -15,25 +15,22 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
-import com.example.admin.dao.ProductDao;
 import com.example.admin.mapper.ProductMapper;
 import com.example.core.Convert;
 import com.example.core.entity.ProductEntity;
 
 
 
-public class ProductTemplate implements ProductDao {
+public class ProductTemplate {
 
 	private DataSource dataSource;
 	private JdbcTemplate jdbcTemplateObject;
 	private Convert convert = new Convert();
 
-	@Override
 	public void setDataSource(DataSource ds) {
 		this.dataSource = ds;
 		this.jdbcTemplateObject = new JdbcTemplate(ds);
 	}	
-	@Override
 	public int getCount() {
 //		SimpleJdbcCall jdbcCall = new SimpleJdbcCall(dataSource).withFunctionName("f_get_count_product");
 //		count = jdbcCall.executeFunction(Integer.class);
@@ -44,7 +41,6 @@ public class ProductTemplate implements ProductDao {
 		return (int) count.get("count");
 
 	}
-	@Override
 	public int put(ProductEntity product) {
 		product.setAlias(convert.getAlias(product.getTitle()));
 		String SQL = "update product "
@@ -86,7 +82,6 @@ public class ProductTemplate implements ProductDao {
 				});
 		return counts;
 	}
-	@Override
 	public int delete(long id) {
 		String SQL = "delete from product "
 				+"  where id = ?";
@@ -107,7 +102,6 @@ public class ProductTemplate implements ProductDao {
 				});
 		return counts;
 	}
-	@Override
 	public int post(ProductEntity product) {
 		product.setAlias(convert.getAlias(product.getTitle()));
 		String SQL = "insert into product "

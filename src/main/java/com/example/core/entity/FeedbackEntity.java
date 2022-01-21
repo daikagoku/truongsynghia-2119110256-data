@@ -20,9 +20,10 @@ public class FeedbackEntity {
 
 	@Column(length = 100, nullable = false)
 	private String email;
-	@Column(length = 11, nullable = false)
-	private String phone;
 
+	@Column()
+	private String content;
+	
 	@Column()
 	private Calendar date;
 	

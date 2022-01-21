@@ -26,6 +26,7 @@ public class ProductEntity {
 	@Column(length = 200)
 	private String description;
 
+	
 	@Column(columnDefinition = "boolean default true")
 	private boolean status;
 

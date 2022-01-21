@@ -23,7 +23,7 @@ public class PostCommentEntity {
 	@Column()
 	private Long parentId;
 
-	@Column(length = 5000)
+	@Column()
 	private String content;
 	@Column()
 	private Calendar date;

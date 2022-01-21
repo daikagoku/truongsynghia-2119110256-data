@@ -24,14 +24,15 @@ public class PostEntity {
 
 	@Column(length = 100, nullable = false)
 	private String alias;
-
-	@Column(length = 5000)
+	@Column()
+	private Long imageId;
+	@Column()
 	private String content;
 
 	@Column(length = 200)
 	private String summary;
 	@Column()
-	private Calendar date;
+	private Calendar createDate;
 	@Column()
 	private Calendar updateDate;
 
@@ -49,7 +50,13 @@ public class PostEntity {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	public Long getImageId() {
+		return imageId;
+	}
 
+	public void setImageId(Long imageId) {
+		this.imageId = imageId;
+	}
 	public String getTitle() {
 		return title;
 	}

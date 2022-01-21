@@ -20,8 +20,11 @@ public class ProductMapper implements RowMapper<ProductDto> {
 			   product.setImage(image);
 		   }
 		   
-		   Float rating = rs.getFloat("rating");	
-		   product.setRating(rating);
+		   Float rating = rs.getFloat("rating");
+		   if(!rs.wasNull()) {
+			   product.setRating(rating);
+		   }
+		   
 		   float price = rs.getFloat("price");
 		   if(!rs.wasNull()) {
 			   product.setPrice(price);

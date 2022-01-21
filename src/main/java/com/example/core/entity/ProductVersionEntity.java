@@ -1,5 +1,7 @@
 package com.example.core.entity;
 
+import java.util.Calendar;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +31,14 @@ public class ProductVersionEntity {
 
 	@Column()
 	private float salePrice;
+	
+	@Column()
+	private Calendar saleDate;
 
+	@Column()
+	private Long imageId;
+	
+	
 	@Column(columnDefinition = "boolean default true")
 	private boolean status;
 

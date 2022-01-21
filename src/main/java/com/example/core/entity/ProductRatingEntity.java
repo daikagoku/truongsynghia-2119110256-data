@@ -23,8 +23,9 @@ public class ProductRatingEntity {
 	
 	@Column()
 	private int vote;
+	
 	@Column()
-	private Calendar date;
+	private Calendar createDate;
 	
 	@Column()
 	private Calendar updateDate;
@@ -71,12 +72,14 @@ public class ProductRatingEntity {
 		this.vote = vote;
 	}
 
-	public Calendar getDate() {
-		return date;
+
+
+	public Calendar getCreateDate() {
+		return createDate;
 	}
 
-	public void setDate(Calendar date) {
-		this.date = date;
+	public void setCreateDate(Calendar createDate) {
+		this.createDate = createDate;
 	}
 
 	public Calendar getUpdateDate() {

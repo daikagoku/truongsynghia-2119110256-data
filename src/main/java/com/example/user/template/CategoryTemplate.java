@@ -1,118 +1,50 @@
 package com.example.user.template;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
-import javax.sql.DataSource;
+import com.example.core.InitSelectSql;
+import com.example.user.dto.CategoryDto;
+import com.example.user.mapper.CategoryMapper;
+import com.example.user.template.base.TemplateBase;
 
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.example.admin.dao.CategoryDao;
-import com.example.core.Convert;
-import com.example.core.entity.CategoryEntity;
-
-public class CategoryTemplate implements CategoryDao {
-
-	private DataSource dataSource;
-	private JdbcTemplate jdbcTemplateObject;
-	private Convert convert = new Convert();
-
-	@Override
-	public void setDataSource(DataSource ds) {
-		this.dataSource = ds;
-		this.jdbcTemplateObject = new JdbcTemplate(ds);
+public class CategoryTemplate extends TemplateBase {
+	public InitSelectSql categorySql = null;
+	public InitSelectSql parentSql = null;
+	public CategoryTemplate() {
+		this.tables = " v_category ";
 	}
-
-	@Override
-	public int getCount() {
-		String SQL = "select count(*) as count " + "from category c";
-		Map<String, Object> count = jdbcTemplateObject.queryForMap(SQL);
-		return (int) count.get("count");
+	
+	public void mergeSql() {
+		if(parentSql != null) {
+			categorySql.addSubWhere("t.parent_id", parentSql.getSql(), "in");
+		}
+		this.sql = categorySql.getSql();	
+		System.out.println(sql);
+		categorySql = null;
+		parentSql = null;
 	}
+	public List<CategoryDto> execute() {
+		mergeSql();
+		List<CategoryDto> categorys = jdbcTemplateObject.query(this.sql, new CategoryMapper());
+		return categorys;
+	};
+	public void initGetCategory() {	
+		categorySql = new InitSelectSql("*","v_category t");
+	};	
 
-	@Override
-	public int put(CategoryEntity category) {
-		category.setAlias(convert.getAlias(category.getTitle()));
-		String SQL = "update product " + " set title = ?" + " set alias = ?" + " set parent_id = ?" + "  where id = ?";
-		int count = jdbcTemplateObject.update(SQL, category.getTitle(), category.getAlias(), category.getParentId(),
-				category.getId());
-		return count;
+	public void addGetById(long id) {
+		categorySql.addWhere("t.id",id);
 	}
-
-	public int[] puts(List<CategoryEntity> categorys) {
-		String SQL = "update product " + " set title = ?" + " set alias = ?" + " set parent_id = ?" + "  where id = ?";
-
-		int[] counts = jdbcTemplateObject.batchUpdate(SQL, new BatchPreparedStatementSetter() {
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				categorys.get(i).setAlias(convert.getAlias(categorys.get(i).getTitle()));
-				ps.setString(1, categorys.get(i).getTitle());
-				ps.setString(2, categorys.get(i).getAlias());
-				ps.setLong(4, categorys.get(i).getParentId());
-				ps.setLong(5, categorys.get(i).getId());
-				;
-			}
-
-			public int getBatchSize() {
-				return categorys.size();
-			}
-		});
-		return counts;
+	public void addGetByAlias(String alias) {
+		categorySql.addWhere("t.alias",alias);
 	}
-
-	@Override
-	public int delete(long id) {
-		String SQL = "delete from category "
-				+"  where id = ?";
-		int count = jdbcTemplateObject.update(SQL, id);
-		return count;
+	public void initGetParentCategory() {	
+		parentSql = new InitSelectSql("pt.id","v_category pt");
+	};
+	public void addGetByParentId(long id) {
+		parentSql.addWhere("pt.id",id);
 	}
-	public int[] deletes(long[] ids) {
-		String SQL = "delete from category "
-				+"  where id = ?";		
-		int[] counts = jdbcTemplateObject.batchUpdate(SQL,
-				new BatchPreparedStatementSetter() {
-				   public void setValues(PreparedStatement ps, int i) throws SQLException {
-					   ps.setLong(1, ids[i]);
-				   }
-				   public int getBatchSize() {
-				      return ids.length;
-				   }
-				});
-		return counts;
+	public void addGetByParentAlias(String alias) {
+		parentSql.addWhere("pt.alias",alias);
 	}
-
-	@Override
-	public int post(CategoryEntity category) {
-		category.setAlias(convert.getAlias(category.getTitle()));
-		String SQL = "insert into category "
-				+"(title,alias,parent_id)"
-				+"values(?,?,?)";
-		int count = jdbcTemplateObject.update(SQL, 
-				category.getTitle(),
-				category.getAlias(),
-				category.getParentId());
-		return count;
-	}
-	public int[] posts(List<CategoryEntity> categorys) {
-		String SQL = "insert into category "
-				+"(title,alias,parent_id)"
-				+"values(?,?,?)";		
-		int[] counts = jdbcTemplateObject.batchUpdate(SQL,
-				new BatchPreparedStatementSetter() {
-				   public void setValues(PreparedStatement ps, int i) throws SQLException {
-					   categorys.get(i).setAlias(convert.getAlias(categorys.get(i).getTitle()));						
-					    ps.setString(1, categorys.get(i).getTitle());
-					    ps.setString(2, categorys.get(i).getAlias());
-					    ps.setLong(3, categorys.get(i).getParentId());
-				   }
-				   public int getBatchSize() {
-				      return categorys.size();
-				   }
-				});
-		return counts;
-	}
-
 }

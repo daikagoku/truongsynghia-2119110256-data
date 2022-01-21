@@ -1,5 +1,5 @@
 package com.example.admin.api;
 
-public class UserApi {
+public class PostAdminApi {
 
 }

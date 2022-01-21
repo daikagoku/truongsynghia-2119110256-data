@@ -29,8 +29,8 @@ public class OrderDetailEntity {
 	private float salePrice;
 	@Column()
 	private Long quantity;
-	@Column()
-	private Calendar date;
+	
+
 	
 	@Column(columnDefinition = "boolean default true")
 	private boolean status;
